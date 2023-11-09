@@ -1,10 +1,13 @@
 package com.aa.act.interview.org;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public abstract class Organization {
 
     private Position root;
+
+    private int employeeId = 1;
     
     public Organization() {
         root = createOrganization();
@@ -21,7 +24,7 @@ public abstract class Organization {
      */
     public Optional<Position> hire(Name person, String title) {
         //your code here
-        return Optional.empty();
+       return fillPosition(root, person, title);
     }
 
     @Override
@@ -36,4 +39,21 @@ public abstract class Organization {
         }
         return sb.toString();
     }
+
+    public Optional<Position> fillPosition (Position position, Name name, String title) {
+        if (position.getTitle().equals(title)) {
+            Employee employee = new Employee(employeeId++, name);
+            position.setEmployee(Optional.of(employee));
+            return Optional.of(position);
+        } else {
+            for (var child : position.getDirectReports()) {
+                var result = fillPosition(child, name, title);
+                if (result.isPresent()) {
+                    return result;
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
 }
